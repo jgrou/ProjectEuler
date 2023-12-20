@@ -5,23 +5,32 @@ def IsPrime(n):
         if n%p == 0:
             return False
         if p > int(n**0.5):
-            break
-    return True
+            return True
+    print('Not enough primes')
 
-primes = []
-N = 10
-p = 2
-factorization = []
+def powmod(base, exponent, modulo):
+    result = 1
+    while exponent > 0:
+        if exponent & 1: # Check if exponent is odd
+            result = (result * base) % modulo
+            
+        base = (base * base) % modulo
+        exponent >>= 1 # right shift assignment operator
+    return result
 
-while p <= N:
+numFactors = 40
+digits = 10**9
+s = 0
+primes = [2]
+p=3
+
+while numFactors > 0:
     if IsPrime(p):
         primes.append(p)
-        while N%p == 0:
-            N = N // p   
-            factorization.append(p)
+        modulo = (9*p)
+        remainder = powmod(10, digits, modulo)
+        if remainder == 1:
+            s += p
+            numFactors -= 1
     p += 1
-    
-while len(primes) < 50:
-    if IsPrime(p):
-        primes.append(p)
-    p += 1
+        
