@@ -14,5 +14,3 @@ while N_divisors < 501:
     for j in range(1, int(math.sqrt(N_triangle))):
         if N_triangle%j==0:
             N_divisors+=2
-    
-    
