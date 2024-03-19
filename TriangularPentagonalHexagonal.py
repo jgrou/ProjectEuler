@@ -7,4 +7,3 @@ while True:
             ans = Tn
             break
     n += 1
-            
