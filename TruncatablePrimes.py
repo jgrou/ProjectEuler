@@ -1,5 +1,3 @@
-import math
-
 TruncatablePrimes = []
 primes = [2,3,5,7]
 x = 11
@@ -7,7 +5,7 @@ x = 11
 while len(TruncatablePrimes) < 11:
     prime = True
     for p in primes:
-        if p > math.sqrt(x):
+        if p > x**0.5:
             break
         elif x%p==0:
             prime = False
