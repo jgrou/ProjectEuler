@@ -19,5 +19,3 @@ while True:
     first_digits = F2 // 10**int(math.log10(F2) - 9)
     if Pandigital(first_digits):
         break
-        
-    
