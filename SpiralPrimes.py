@@ -1,7 +1,5 @@
-import math
-
 def Prime(n):
-    for p in range(2,int(math.sqrt(n)+1)):
+    for p in range(2,int(n**0.5+1)):
         if n%p==0:
             return False
     return True
