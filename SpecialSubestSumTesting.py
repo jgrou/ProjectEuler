@@ -1,4 +1,3 @@
-       
 def find_subsets(nums):
     def backtrack(start, subset):
         subsets.append(subset[:])
