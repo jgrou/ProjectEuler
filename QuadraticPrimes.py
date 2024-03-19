@@ -1,5 +1,3 @@
-import math
-
 MaxNumberOfConsecutivePrimes = 0
 
 for a in range(-999,1000):
@@ -11,7 +9,7 @@ for a in range(-999,1000):
             if number < 2:
                 prime = False
             else:
-                for i in range(2,int(math.sqrt(number)+1)):
+                for i in range(2, int(number**0.5 + 1)):
                     if number%i == 0:
                         prime = False
                         break
