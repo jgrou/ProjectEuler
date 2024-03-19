@@ -1,5 +1,3 @@
-import math
-
 N = 2000000
 primes = []
 x = 2
@@ -7,7 +5,7 @@ x = 2
 while x<N:
     prime = True
     for p in primes:
-        if p > math.sqrt(x):
+        if p > x**0.5:
             break
         elif x%p==0:
             prime = False
