@@ -29,4 +29,3 @@ for p in primes:
         CircularPrimes.append(p)
     
 ans = len(CircularPrimes)
-        
