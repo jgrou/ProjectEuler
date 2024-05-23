@@ -1,22 +1,22 @@
 def Check(number):
     string = str(number)
-    if string[0] != '1':
-        return False
-    if string[2] != '2':
-        return False
-    if string[4] != '3':
-        return False
-    if string[6] != '4':
-        return False
-    if string[8] != '5':
-        return False
-    if string[10] != '6':
-        return False
-    if string[12] != '7':
+    if string[16] != '9':
         return False
     if string[14] != '8':
         return False
-    if string[16] != '9':
+    if string[12] != '7':
+        return False
+    if string[10] != '6':
+        return False
+    if string[8] != '5':
+        return False
+    if string[6] != '4':
+        return False
+    if string[4] != '3':
+        return False
+    if string[2] != '2':
+        return False
+    if string[0] != '1':
         return False
     return True
 
