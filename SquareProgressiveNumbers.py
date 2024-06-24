@@ -1,28 +1,37 @@
 limit = 10**12
-ans = 9 # We skip x=1 in the loop, so we have to add this answer
 
-# r has to be a perfect power
+# d = a * r / b; q = a^2 * r / b^2
+# We can assume without loss of generality that a and b are
+# relatively prime, so q can be an integer only if r is divisible by b^2.  So
+# r = c*b^2, q = a*c*b, d = a^2*c
+# n = dq+r = a^3*b*c^2 + c*b^2.
 
-for i in range(2, int(limit**0.5)):
-    n = i**2
-    min_d = int((n-1)**(1/3)) # max_d = i
-    found = False
-    # d is the mutiple of a square: d=m*k^2
-    for k in range(2, int(i**0.5)+1):
-        m = max(int(min_d / k**2),1)
-        d = m * k**2
+def gcd(a, b):
+    while b: 
+        a, b = b, a%b 
+    return a
+    
+def issquare(n):
+    x = int(n**0.5)
+    return x**2 == n
+
+s = set()
+
+for a in range(2, int(limit**(1/3)) + 1):
+    a3 = a**3
+    sb = (a + 1) % 2 + 1 # If a is odd, this is 1, if even, this is 2: a,b are relatively prime
+    
+    for b in range(1, a, sb):
+        n = b * (a3 + b)
         
-        while d < i:
-            q = n // d
-            r = n % d
-            if q*r == d**2: # r < d < q
-                print(n,i,q,d,r)
-                ans += n
-                found = True
-                break # Once we find that n is progressive we do not need to check other d's
-                
-            m += 1
-            d = m * k**2
-        
-        if found:
+        if n > limit:
             break
+        if gcd(a, b) == 1:
+            c = 1
+            while n < limit:
+                if issquare(n): 
+                    s.add(n)
+                c += 1
+                n = b * c * (c * a3 + b)
+            
+print(sum(s))
