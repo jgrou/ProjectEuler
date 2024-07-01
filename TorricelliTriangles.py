@@ -1,39 +1,58 @@
-lim = 1000
+import math
+lim = 120_000
+
+#%% the values of C of all 60-degree triangles with sides A < B < C
+# This is almost the same as the other numbers, but not quite
+s = set()
+for m in range(1, math.ceil((lim+1)**0.5)+1):
+ for n in range(1, m):
+    if (m-n)%3 != 0 and math.gcd(m, n)==1:
+        C = 2*m*n+m*m # Gives values of C not exceeding cmax in primitive triangles.
+        # Now all multiples of the primitive triangle
+        for i in range(1, lim // C + 1):
+            s.add(C*i) # Too much: 55, 65, 99, 117, 119, 133, 143, 153,
+
+ans = sum(s)
+
+#%%
 values = set()
 
-for c in range(1, lim): # Angle of at most 120 degrees
-    for b in range(int(c/3**0.5), c+1):
+def sieve_of_eratosthenes(n):
+    """Returns a list of all prime numbers up to n."""
+    is_prime = [True] * (n + 1)
+    p = 2
+    while p * p <= n:
+        if is_prime[p]:
+            for i in range(p * p, n + 1, p):
+                is_prime[i] = False
+        p += 1
+    prime_numbers = [p for p in range(2, n + 1) if is_prime[p]]
+    return prime_numbers
+
+primes = sieve_of_eratosthenes(lim)
+
+for c in primes: # 
+    for b in range(int(c/3**0.5), c+1): #Angle of at most 120 degrees
         mina = max(1, 2/3**0.5 * c - b)
         for a in range(int(mina), b+1):
             x_C = (c**2 + b**2 - a**2) / (2 * c) # x coordinate of C, A is at (0,0) and B at (c,0)
             y_C = (b**2 - x_C**2)**0.5 # y coordinate of C
-            
+                
             # Find the point O which is in the middle down AB
             x_O = c / 2
             y_O = -3**0.5 * x_O
             
-            # Find N by solving quadritc equation
-            a_N = 4 * (c - x_C)**2 + 4 * y_C**2
-            b_N = 4 * (c - x_C) * (y_C**2 + x_C**2 - c**2) - 8 * c * y_C**2
-            c_N = (y_C**2 + x_C**2 - c**2)**2 - 4 * y_C**2 * a**2 + 4 * y_C**2 * c**2
+            dx = (a**2 - b**2) / (2 * c)
+            dy = y_O - y_C
             
-            x_N = (-b_N + (b_N**2 - 4 * a_N * c_N)**0.5) / (2 * a_N)
-            y_N = (a**2 - (x_N - c)**2)**0.5
-            
-            # Find intersection of AN and OC
-            rc_AN = y_N / x_N
-            if x_C == x_O:
-                x_T = x_C
-            else:
-                rc_OC = (y_C - y_O) / (x_C - x_O)
-                x_T = (y_O - rc_OC * x_O) /  (rc_AN - rc_OC)
-            y_T = rc_AN * x_T
-            
-            # Calculate distance to T
-            p = (x_T**2 + y_T**2)**0.5 # Distance AT
-            q = ((x_C - x_T)**2 + (y_C - y_T)**2)**0.5 # Distance CT
-            r = ((c - x_T)**2 + y_T**2)**0.5 # Distance BT
-            
-            if int(round(p,10)) == round(p,10) and int(round(p,10)) == round(p,10) and int(round(p,10)) == round(p,10):
-                print(p+q+r)
-                values.add(p+q+r)
+            CO = (dx**2 + dy**2)**0.5
+            CO = round(CO, 10) # To avoid rounding errors
+        
+            if int(CO) == CO:
+                print(a,b,c,CO)
+                # If it holds for a,b,c then also for all multiples
+                for i in range(1, lim // int(CO) + 1):
+                    values.add(int(CO) * i)
+                break # In practie we only find 1
+        if int(CO) == CO:
+            break
