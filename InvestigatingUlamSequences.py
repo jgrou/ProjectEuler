@@ -17,7 +17,7 @@ def ulam(terms, old_arr=[1,2]):
 
 		# traverse the array and check if i can be represented as sum of two distinct element of the array 
         for j in range(term):
-			# Check if i-arr[j] exist in the array or not using set. If yes, Then i can be represented as sum of arr[j] + (i- arr[j]) 
+			# Check if i-arr[j] exist in the array using set. If yes, then i can be represented as arr[j]+(i-arr[j]) 
             if (i - arr[j]) in s and arr[j] != (i - arr[j]): 
                 count += 1
             if count > 2: # if Count is greater than 2 break the loop 
