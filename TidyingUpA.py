@@ -1,64 +1,71 @@
-import random
-import itertools
 import math
+import time
 
-limit = 10
+def find_paths(matrix, path, i, j, result, rows, cols):
+    # If we reach the bottom-right corner, add the path to the result list
+    if i == rows - 1 and j == cols - 1:
+        # Add the final piece that makes everything one segment again
+        result.append(path[:] + [1])
+        return
 
-#%%
-ans = 0
-max_segments = (limit+1)//2
+    # Move Down
+    if i + 1 < rows:
+        path.append(matrix[i + 1][j])
+        find_paths(matrix, path, i + 1, j, result, rows, cols)
+        path.pop()  # Backtrack
 
-def M(order):
-    s = set()
-    segments = 0
-    maximum = 0
-    
-    for n in order:
-        if n-1 in s and n+1 in s:
-            segments -= 1
-        if n-1 not in s and n+1 not in s:
-            segments += 1
-            maximum = max(segments, maximum)
-        s.add(n)
-        if maximum == max_segments:
-            break
+    # Move Right
+    if j + 1 < cols:
+        path.append(matrix[i][j + 1])
+        find_paths(matrix, path, i, j + 1, result, rows, cols)
+        path.pop()  # Backtrack
         
-    return maximum
-
-#for order in itertools.permutations(range(1,limit+1),limit-1): # Last one doesn't matter: 5% faster
-#    ans += M(order)
-
-ans /= math.factorial(limit)
-# 1 occurs 2**(limit-1) times
-
-#%% Random
-N = 10**6
-x = list(range(1,limit+1))
-
-for _ in range(N):
-    random.shuffle(x)
-    ans += M(x)
+def Product(tuple1, tuple2):
+    cols = len(tuple1)
+    rows = len(tuple2)
+    matrix = [cols * [None] for _ in range(rows)]
     
-ans /= N
+    for i1, t1 in enumerate(tuple1):
+        for i2, t2 in enumerate(tuple2):
+            matrix[i2][i1] = t1 + t2
+            
+    result = []
+    path = [matrix[0][0]]
+    find_paths(matrix, path, 0, 0, result, rows, cols)
+    return result
 
-#%% Dynamic programming?
+start = time.time()
+limit = 15
+ans = 0
 list_of_dictionaries = (limit+1) * [None]
-list_of_dictionaries[0] = {0:1}
-list_of_dictionaries[1] = {1:1}
+list_of_dictionaries[0] = {(0,):1}
+list_of_dictionaries[1] = {(0,1):1}
 
 for n in range(2,limit+1):
-    dictionary ={}
-    max_segments = (n+1)//2
-    
-    for i in range(1, max_segments+1):
-        dictionary[i] = 0
-    
-    for last_piece in range(1,n+1):
-        left_half = list_of_dictionaries[last_piece-1]
-        right_half = list_of_dictionaries[n-last_piece]
-        for left_key, left_item in left_half.items():
-            for right_key, right_item in right_half.items():
-                # This overestimates
-                dictionary[left_key+right_key] += math.comb(n-1, last_piece-1) * left_item * right_item
+    dictionary = {}
+
+    for last_piece in range(1, (n+1)//2 + 1):
+        # If left or right is bigger, doesn't matter
+        if last_piece == (n+1)/2:
+            multiplier = 1
+        else:
+            multiplier = 2
+        left_dict = list_of_dictionaries[last_piece-1]
+        right_dict = list_of_dictionaries[n-last_piece]
+        
+        for left_key, left_item in left_dict.items():
+            for right_key, right_item in right_dict.items():
+                for t in Product(left_key, right_key):
+                    if tuple(t) in dictionary:
+                        dictionary[tuple(t)] += left_item * right_item * multiplier
+                    else:
+                        dictionary[tuple(t)] = left_item * right_item * multiplier
                 
     list_of_dictionaries[n] = dictionary
+    
+for key, value in dictionary.items():
+    ans += max(key) * value
+    
+ans /= math.factorial(limit)
+print(ans)
+print(time.time() - start)
