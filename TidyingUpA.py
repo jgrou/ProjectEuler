@@ -1,37 +1,31 @@
 import math
 import time
 
-def find_paths(matrix, path, i, j, result, rows, cols):
-    # If we reach the bottom-right corner, add the path to the result list
+def find_paths(tuple1, tuple2, path, i, j, result, rows, cols):
+    # Add the final piece that makes everything one segment again
     if i == rows - 1 and j == cols - 1:
-        # Add the final piece that makes everything one segment again
         result.append(path[:] + [1])
         return
 
-    # Move Down
+    # Place left piece
     if i + 1 < rows:
-        path.append(matrix[i + 1][j])
-        find_paths(matrix, path, i + 1, j, result, rows, cols)
-        path.pop()  # Backtrack
+        path.append(tuple1[i + 1] + tuple2[j])
+        find_paths(tuple1, tuple2, path, i + 1, j, result, rows, cols)
+        path.pop()
 
-    # Move Right
+    # Place right piece
     if j + 1 < cols:
-        path.append(matrix[i][j + 1])
-        find_paths(matrix, path, i, j + 1, result, rows, cols)
-        path.pop()  # Backtrack
+        path.append(tuple1[i] + tuple2[j + 1])
+        find_paths(tuple1, tuple2, path, i, j + 1, result, rows, cols)
+        path.pop()
         
 def Product(tuple1, tuple2):
-    cols = len(tuple1)
-    rows = len(tuple2)
-    matrix = [cols * [None] for _ in range(rows)]
-    
-    for i1, t1 in enumerate(tuple1):
-        for i2, t2 in enumerate(tuple2):
-            matrix[i2][i1] = t1 + t2
-            
+    # For two tuples compute every combination of placing left and right: math.comb(cols+rows, cols)
+    rows = len(tuple1)
+    cols = len(tuple2)   
     result = []
-    path = [matrix[0][0]]
-    find_paths(matrix, path, 0, 0, result, rows, cols)
+    path = [0]
+    find_paths(tuple1, tuple2, path, 0, 0, result, rows, cols)
     return result
 
 start = time.time()
@@ -39,9 +33,8 @@ limit = 15
 ans = 0
 list_of_dictionaries = (limit+1) * [None]
 list_of_dictionaries[0] = {(0,):1}
-list_of_dictionaries[1] = {(0,1):1}
 
-for n in range(2,limit+1):
+for n in range(1,limit+1):
     dictionary = {}
 
     for last_piece in range(1, (n+1)//2 + 1):
