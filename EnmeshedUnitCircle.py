@@ -16,7 +16,7 @@ def A(t):
     for i in range((n+1)//2):
         res += (np.sin(t[i+1]) - np.sin(t[i])) * np.cos(t[i])
         res += (np.cos(t[i]) - np.cos(t[i+1])) * np.sin(t[i+1])
-    return res
+    return 4*res
 
 # Define the constraints
 constraints = []
@@ -27,7 +27,11 @@ constraints.append({'type': 'ineq', 'fun': lambda x: np.pi/4 - x[-1]})  # y[-1] 
 
 initial_guess = np.linspace(0, np.pi/4, n//2 + 2)[1:-1]
 result = optimize.minimize(A, initial_guess, constraints=constraints)
-ans = 4*result.fun
+ans = 0
+while ans != result.fun:
+    ans = result.fun
+    result = optimize.minimize(A, result.x, constraints=constraints)
+    
 print(round(ans,10))
 
 #%%
