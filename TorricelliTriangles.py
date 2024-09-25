@@ -1,20 +1,4 @@
-import math
-lim = 120_000
-
-#%% the values of C of all 60-degree triangles with sides A < B < C
-# This is almost the same as the other numbers, but not quite
-s = set()
-for m in range(1, math.ceil((lim+1)**0.5)+1):
- for n in range(1, m):
-    if (m-n)%3 != 0 and math.gcd(m, n)==1:
-        C = 2*m*n+m*m # Gives values of C not exceeding cmax in primitive triangles.
-        # Now all multiples of the primitive triangle
-        for i in range(1, lim // C + 1):
-            s.add(C*i) # Too much: 55, 65, 99, 117, 119, 133, 143, 153,
-
-ans = sum(s)
-
-#%%
+lim = 25
 values = set()
 
 def sieve_of_eratosthenes(n):

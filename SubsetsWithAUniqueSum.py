@@ -1,54 +1,39 @@
-limit = 20
+limit = 100
 k = limit//2
-  
-#%% Brute force
-A = [i**2 for i in range(1,limit+1)]
-res = {}
-stop = len(A)-k+1
 ans = 0
+   
+# max_s[i][j] means the max sum you can achieve with i terms of at most j
+max_s = [(limit+1) * [0] for _ in range(k+1)]
 
-def FindSubset(subset, j, start):
-    if j ==k:
-        yield sum(subset)
+for i in range(k+1):
+    for j in range(i,limit+1):
+        max_s[i][j] = sum(m**2 for m in range((j-i)+1,j+1))
+        
+min_s = (k+1) * [0]
+
+for j in range(1,k+1):
+    min_s[j] = min_s[j-1] + j**2
+    
+def SetSum(s, n, max_i):
+    global solution_count
+    
+    if solution_count > 1: # Stop recursion if more than one solution is already found
         return
+    
+    if s < min_s[n] or s > max_s[n][max_i]: # Not possible to make s anymore with remaining numbers
+        return
+    
+    if n==0 and s==0: # We found a solution
+        solution_count += 1
+        if solution_count > 1:  # Stop early if 2nd solution is found
+            return
+    
+    for j in range(n, max_i+1):
+        SetSum(s-j**2, n-1, j-1)
         
-    for i in range(start, stop+j):
-        subset.add(A[i])
-        yield from FindSubset(subset, j+1, i+1)
-        subset.remove(A[i])
-
-for s in FindSubset(set(), 0, 0):
-    if s in res:
-        res[s] += 1
-    else:
-        res[s] = 1
-        
-for s in res:
-    if res[s] == 1:
+for s in range(min_s[-1], max_s[-1][-1]+1):
+    solution_count = 0
+    SetSum(s, k, limit)
+    
+    if solution_count == 1:
         ans += s
-
-#%% Recursion: this is actually slower
-SquareSums = [{} for _ in range(k+1)]
-
-def f(n_elements=1, start=1, square_sum=0, tup=tuple()):
-    if n_elements == k+1:
-        return
-    
-    for i in range(start,limit+1):
-        new_square_sum = square_sum + i**2
-        new_tup = tup + (i,)
-        if new_square_sum in SquareSums[n_elements]:
-            SquareSums[n_elements][new_square_sum].add(new_tup)
-        else:
-            SquareSums[n_elements][new_square_sum] = {new_tup}
-
-        f(n_elements+1, i+1, new_square_sum, new_tup)
-    
-f()
-
-ans2 = 0
-
-for key in SquareSums[k]:
-    if len(SquareSums[k][key]) > 1:
-        continue
-    ans2 += key
