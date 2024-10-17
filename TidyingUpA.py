@@ -39,10 +39,7 @@ for n in range(1, limit+1):
 
     for last_piece in range(1, (n+1)//2 + 1):
         # If left or right is bigger, doesn't matter
-        if last_piece == (n+1)/2:
-            multiplier = 1
-        else:
-            multiplier = 2
+        multiplier = 1 if last_piece == (n+1)/2 else 2
         left_dict = list_of_dictionaries[last_piece-1]
         right_dict = list_of_dictionaries[n-last_piece]
         
@@ -54,7 +51,7 @@ for n in range(1, limit+1):
                         dictionary[t_tuple] += left_item * right_item * multiplier
                     else:
                         dictionary[t_tuple] = left_item * right_item * multiplier
-                
+
     list_of_dictionaries[n] = dictionary
 
 for key, value in dictionary.items():
