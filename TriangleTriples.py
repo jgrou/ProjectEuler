@@ -1,38 +1,83 @@
-def ndiv(n):
-    """
-    Function to count the number of divisors of a given number.
+class FenwickTree:
+    def __init__(self, size):
+        self.tree = [0] * (size + 1)
+        self.size = size
+
+    def update(self, index, delta):
+        while index <= self.size:
+            self.tree[index] += delta
+            index += index & -index
+
+    def query(self, index):
+        sum_ = 0
+        while index > 0:
+            sum_ += self.tree[index]
+            index -= index & -index
+        return sum_
+
+def count_decreasing_triplets(nums):
+    n = len(nums)
     
-    Parameters:
-    n (int): The number for which divisors are counted.
+    # Coordinate compression
+    sorted_nums = sorted(set(nums))
+    rank = {v: i + 1 for i, v in enumerate(sorted_nums)}  # Map value to rank (1-based index)
+    compressed = [rank[num] for num in nums]
+    max_rank = len(sorted_nums)
 
-    Returns:
-    int: The number of divisors of n.
-    """
-    if n <= 0:
-        return 0  # No divisors for non-positive integers
+    # Fenwick Tree for greater_left
+    greater_left = [0] * n
+    fenwick_left = FenwickTree(max_rank)
+    for i in range(n):
+        # Count elements greater on the left
+        greater_left[i] = fenwick_left.query(max_rank) - fenwick_left.query(compressed[i])
+        # Update Fenwick Tree with the current element
+        fenwick_left.update(compressed[i], 1)
 
+    # Fenwick Tree for smaller_right
+    smaller_right = [0] * n
+    fenwick_right = FenwickTree(max_rank)
+    for i in range(n - 1, -1, -1):
+        # Count elements smaller on the right
+        smaller_right[i] = fenwick_right.query(compressed[i] - 1)
+        # Update Fenwick Tree with the current element
+        fenwick_right.update(compressed[i], 1)
+
+    # Calculate total triplets
     count = 0
-    for i in range(1, int(n**0.5) + 1):
-        if n % i == 0:
-            if i * i == n:
-                count += 1  # Perfect square
-            else:
-                count += 2  # Both i and n/i are divisors
+    for i in range(n):
+        count += greater_left[i] * smaller_right[i]
     return count
 
-limit = 1000
+limit = 60_000_000
+PrimeFactorization = [{} for n in range(limit+2)]
+IsPrime = (limit + 2) * [True]
+
+for p in range(2, limit+2):
+    if IsPrime[p]:
+        for k in range(p**2, limit+2, p):
+            IsPrime[k] = False
+        power = 1
+        while p**power <= limit+2:
+            for k in range(p**power, limit+2, p**power):
+                if p in PrimeFactorization[k]:
+                    PrimeFactorization[k][p] += 1
+                else:
+                    PrimeFactorization[k][p] = 1
+            power+=1
+
 ans = 0
 dT = (limit+1)*[None]
 dT[1] = 1
 
 for k in range(2,limit+1):
-    dT[k] = ndiv(k*(k+1)//2)
-    
-for i in range(1, limit-1):
-    for j in range(i+1, limit):
-        if dT[i] > dT[j]:
-            for k in range(j+1, limit+1):
-                if dT[j] > dT[k]:
-                    ans += 1
-                    
-print(ans)
+    res = 1
+    for key in PrimeFactorization[k].keys() | PrimeFactorization[k+1].keys():
+        # Safely retrieve the value for the key from dict, or 0 if the key is not present.
+        value = PrimeFactorization[k].get(key,0) + PrimeFactorization[k+1].get(key,0) 
+        if key == 2:
+            value -= 1
+        res *= (value+1)
+    dT[k] = res
+
+ans = count_decreasing_triplets(dT[1:])
+print(ans%10**18)
