@@ -4,7 +4,7 @@ for g11 in range(10):
     for g12 in range(10):
         for g13 in range(10):
             for g14 in range(10):
-                s = g11 + g12 + g13 + g14 + g14
+                s = g11 + g12 + g13 + g14
                 maxg21 = min(s - g11, 9)
                 ming21 = max(s - g11 - 2 * 9, 0) # Can add at most 2 times 9 after this
                 for g21 in range(ming21, maxg21+1):
@@ -19,7 +19,7 @@ for g11 in range(10):
                             g24 = s - g21 - g22 - g23
                             if g24 > min(s - g14, 9):
                                 continue
-                            if g24 < max(s - g14 - 2 * 9, 0) :
+                            if g24 < max(s - g14 - 2 * 9, 0):
                                 continue
                             maxg31 = min(s - g11 - g21, 9)
                             ming31 = max(s - g11 - g21 - 9, 0)
@@ -39,7 +39,7 @@ for g11 in range(10):
                                     continue
                                 # Check bounds for third row, third column and diagonal
                                 maxg33 = min(s - g11 - g22, s - g31 - g32, s - g13 - g23, 9)
-                                ming33 = min(s - g11 - g22 - 9, s - g31 - g32 - 9, s - g13 - g23 - 9, 0)
+                                ming33 = max(s - g11 - g22 - 9, s - g31 - g32 - 9, s - g13 - g23 - 9, 0)
                                 for g33 in range(ming33, maxg33+1):
                                     g34 = s - g31 - g32 - g33
                                     if g34 < 0 or g34 > 9:
