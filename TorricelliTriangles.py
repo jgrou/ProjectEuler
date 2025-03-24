@@ -18,3 +18,4 @@ for p in range(1, LIMIT):
                     ans += (p+q+r)
                     
 print(ans)
+# 19577058, but not correct
