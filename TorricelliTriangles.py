@@ -1,5 +1,5 @@
 LIMIT = 120_000
-ans = 0
+d = set()
 
 for p in range(1, LIMIT):
     for q in range(p, LIMIT - p):
@@ -15,7 +15,7 @@ for p in range(1, LIMIT):
                 b = round(b_sq**0.5)
 
                 if c**2 == c_sq and b**2 == b_sq:
-                    ans += (p+q+r)
+                    d.add(p+q+r)
                     
-print(ans)
-# 19577058, but not correct
+print(sum(d))
+# 19054130, but not correct
