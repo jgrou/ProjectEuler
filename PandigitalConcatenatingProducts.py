@@ -12,12 +12,11 @@ def partition(current, n, max_i):
     for i in range(1, min(max_i,n)+1):
         partition(current+(i,), n-i, i)
 
-partitions = []
-partition(tuple(), 8, 7)
-
 # First try fist integer having 1 digit: 9 * [1, 87345026] = 9786105234
 ans = 9786105234
 # Then try two digits: finds the solution
+partitions = []
+partition(tuple(), 8, 7)
 
 for k in range(98,9,-1):
     d1 = k//10
