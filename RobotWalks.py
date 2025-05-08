@@ -1,45 +1,36 @@
-# Every walk can be represented as a binary string of 1 for anti-clockwise and 0 for clockwise
-# mirroring or reversing should still work
-# There must be a multiple of 5 steps left and right: but not all of these paths are valid.
-
-# Swap from 1 to 0 or vice versa:
-# new angle: = 180 + old_angle
-# New center += (cos(phi) + sin(phi)
-
 import math
-import itertools
-limit = 25
+
+# Every walk can be represented as a binary string of 1 for anti-clockwise and 0 for clockwise
+# Represent every point as a point on the unit circle with center (x,y) and angle phi
+# Remember dictionary with keys (x,y,phi,prev_bit) and how often every final position occurs
+limit = 70
 ans = 0
+positions = {(0,0,0,1):1}
 
-for n_zeros in range(0, limit//2, 5): # We can just swap all zeros and ones to obtain symmetric figure
-    for zero_positions in itertools.combinations(range(limit), n_zeros):
-        bits = [1] * limit
-        for pos in zero_positions:
-            bits[pos] = 0
-
-        # Represent every point as a point on the unit circle with center (x,y) and angle phi
-        x = 0
-        y = 0     
-        prev_bit = 1
-        phi = 0
-    
-        for bit in bits:
+for steps in range(limit):
+    new_positions = {}
+    for (x,y,phi,prev_bit) in positions:
+        for bit in [0,1]:
             if bit != prev_bit:
-                x += 2*math.cos(phi*math.pi/180) # math uses radial
-                y += 2*math.sin(phi*math.pi/180)
-                phi += 180
+                new_x = round(x + 2*math.cos(phi*math.pi/180),8) # math uses radial
+                new_y = round(y + 2*math.sin(phi*math.pi/180),8)
+                new_phi = phi + 180
+            else:
+                new_x = x
+                new_y = y
+                new_phi = phi
         
             if bit == 0:
-                phi -= 72
+                new_phi -= 72
             elif bit == 1:
-                phi += 72
-            phi %= 360
-            prev_bit = bit
+                new_phi += 72
+            new_phi %= 360
 
-        final_x = x + math.cos(phi*math.pi/180)
-        final_y = y + math.sin(phi*math.pi/180)
+            if (new_x, new_y, new_phi, bit) not in new_positions:
+                new_positions[(new_x, new_y, new_phi, bit)] = positions[(x,y,phi,prev_bit)]
+            else:
+                new_positions[(new_x, new_y, new_phi, bit)] += positions[(x,y,phi,prev_bit)]
+    positions = new_positions
 
-        if round(final_x, 8) == 1.0 and round(final_y,8) == 0.0:
-            ans += 1
-
-ans *=2
+ans = 2*positions[(0,0,0,1)]
+print(ans)
