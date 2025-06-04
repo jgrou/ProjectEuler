@@ -1,66 +1,64 @@
-import math
+# https://en.wikipedia.org/wiki/Simple_continued_fraction#Best_rational_approximations
 
 def continued_fraction_sqrt(n):
-    """Compute the continued fraction representation of sqrt(n).
-    
-    Returns:
-        (a0, [a1, a2, ..., a_{period}]) such that:
-        sqrt(n) = a0 + 1 / (a1 + 1 / (a2 + ...))
-    """
+    """Compute the continued fraction representation of sqrt(n)"""
     m = 0
     d = 1
-    a0 = a = int(math.isqrt(n))
+    a0 = a = int(n**0.5)
     
-    if a * a == n:
-        return (a, [])  # n is a perfect square
-
     period = []
-    seen = {}
+    seen = set()
 
     while (m, d, a) not in seen:
-        seen[(m, d, a)] = True
+        seen.add((m, d, a))
         m = d * a - m
         d = (n - m * m) // d
         a = (a0 + m) // d
         period.append(a)
 
-    return (a0, period)
+    return (a0, period[:-1])
 
 def BestApproximation(n, d):
     a0, period = continued_fraction_sqrt(n)
-
-    r_new = a0
-    r = 1
-    s_new = 1
-    s = 0
+    r_new, r = a0, 1
+    s_new, s = 1, 0
     i = 0
-    n = len(period)
+    m = len(period)
 
     while s_new <= d:
-        r_new, r, r_old = period[i%n] * r_new + r, r_new, r
-        s_new, s, s_old = period[i%n] * s_new + s, s_new, s
+        r_new, r, r_old = period[i] * r_new + r, r_new, r
+        s_new, s, s_old = period[i] * s_new + s, s_new, s
         i += 1
+        i%=m
 
     # Truncate the continued fraction, and reduce its last term by a chosen amount (possibly zero)
-    a_k = a = period[(i-1)%n]
-    even = not (a_k&1)
+    a = period[i-1]
+    even = not (a&1)
+    half = (a+1) // 2
 
-    while s_new > d:
+    while a > half: # The reduced term cannot have less than half its original value.
         a -= 1
-        if a < (a_k + 1) // 2: # The reduced term cannot have less than half its original value.
-            return s
-        
         r_new = a * r + r_old
         s_new = a * s + s_old
         # If the final term is even, half its value is admissible only if the corresponding semiconvergent is
         # better than the previous convergent. 
-        if a == (a_k) // 2 and even: 
-            if abs(r / s - n**0.5) <= abs(r_new / s_new - n**0.5):
-                return s
-    return s_new
+        if a == half and even:
+            if r_new * s > r * s_new:
+                if n * (2 * s * s_new)**2 <= (r_new * s + r * s_new)**2: # Avoid machine precision
+                    continue
+            else:
+                if n * (2 * s * s_new)**2 >= (r_new * s + r * s_new)**2:
+                    continue
+        if s_new <= d:
+            return s_new, r_new
+        
+    return s,r
 
 ans = 0
 
-for n in range(2, 100_001):
-    if round(n**0.5)**2 != n:
-        ans += BestApproximation(n, 10**12)
+for n in range(2,100_001):
+    if int(n**0.5)**2 != n:
+        s,r = BestApproximation(n, 10**12)
+        ans += s
+
+print(ans)
