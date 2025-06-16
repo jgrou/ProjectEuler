@@ -1,50 +1,39 @@
-k = 4000
-g = k * [1]
+limit = 10**18
+MOD = 20092010
+ 
+def mod(x):
+    x %= MOD
+    return x + MOD if x < 0 else x
 
-for k in range(2000,k):
-    g[k] = g[k-2000] + g[k-1999]
+def poly_mul(a, b):
+    ret = [0] * (len(a) + len(b) - 1)
+    for i in range(len(a)):
+        for j in range(len(b)):
+            ret[i + j] = (ret[i + j] + a[i] * b[j]) % MOD
+    return ret
 
-def mat_mult(A, B, mod):
-    n = len(A)
-    C = [[0]*n for _ in range(n)]
-    for i in range(n):
-        for k in range(n):
-            if A[i][k] == 0:
-                continue
-            for j in range(n):
-                C[i][j] = (C[i][j] + A[i][k] * B[k][j]) % mod
-    return C
+def poly_div(a, b):
+    ret = a[:]
+    for i in range(len(ret)-1, len(b)-2,-1):
+        for j in range(len(b)):
+            ret[i + j - len(b) + 1] = mod(ret[i + j - len(b) + 1] - ret[i] * b[j])
+    return ret[:len(b) - 1]
 
-def mat_pow(A, power, mod):
-    n = len(A)
-    result = [[int(i == j) for j in range(n)] for i in range(n)]  # Identity matrix
-    while power > 0:
-        if power % 2 == 1:
-            result = mat_mult(result, A, mod)
-        A = mat_mult(A, A, mod)
-        power //= 2
-    return result
+def kitamasa(c, a, n):
+    d = [1]         # result poly
+    xn = [0, 1]     # x^1
+    f = [mod(-ci) for ci in c] + [1]  # f(x) = x^k - sum c_i x^i
+    while n:
+        if n & 1:
+            d = poly_div(poly_mul(d, xn), f)
+        xn = poly_div(poly_mul(xn, xn), f)
+        n >>= 1
+    return sum(mod(ai * di) for ai, di in zip(a, d)) % MOD
 
-A = [2000 * [0] for _ in range(2000)] # Transition matrix to go the next state
+c = 2000 * [0]
+c[0] = 1
+c[1] = 1
+a = 2000 * [1]
 
-for i in range(1999):
-    A[i][i+1] = 1
-
-A[-1][0] = 1
-A[-1][1] = 1
-
-# Example:
-mod = 20092010
-power = k - 1999
-binary_rep = bin(power)[2:]
-n_doubles = len(binary_rep)
-powers_of_A = n_doubles * [None]
-powers_of_A[0] = A  #A**(2**0) = A**1 = A
-
-for i in range(1, n_doubles):
-    powers_of_A[i] = mat_mult(powers_of_A[i-1], powers_of_A[i-1], mod)
-
-
-
-# To find g[k] we need A**(k-1999) and multiply with [1,1,...,1] and find last item: i.e. sum of the last row
-#result = mat_pow(A, k, mod)
+ans = kitamasa(c,a,limit)
+print(ans)
