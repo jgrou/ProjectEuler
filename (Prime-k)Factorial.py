@@ -21,3 +21,5 @@ for p in Primes[2:]:
         S += f
     S %= p
     ans += S
+
+print(ans)
